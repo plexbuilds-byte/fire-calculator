@@ -18,11 +18,9 @@ No build step or dependencies. Open `index.html` in any modern browser:
 
 ## Live demo
 
-After you enable [GitHub Pages](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site) on this repo (Settings → Pages → deploy from `main` branch, root folder), your site will be at:
+[https://plexbuilds-byte.github.io/fire-calculator/](https://plexbuilds-byte.github.io/fire-calculator/)
 
-`https://YOUR_USERNAME.github.io/fire-calculator/`
-
-Replace `YOUR_USERNAME` with your GitHub username and the repo name if you chose a different one.
+Hosted with [GitHub Pages](https://pages.github.com/) from the `main` branch.
 
 ## Disclaimer
 
