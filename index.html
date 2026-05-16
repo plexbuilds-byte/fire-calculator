@@ -73,6 +73,16 @@
         .grid-inputs {
           grid-template-columns: repeat(2, 1fr);
         }
+
+        .returns-grid {
+          grid-template-columns: repeat(3, 1fr);
+        }
+      }
+
+      .returns-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
       }
 
       .card {
@@ -92,19 +102,107 @@
         font-weight: 600;
       }
 
-      label {
-        display: block;
-        font-size: 0.85rem;
-        font-weight: 500;
-        color: var(--text);
+      .label-row {
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
         margin-bottom: 0.35rem;
       }
 
-      .hint {
-        font-size: 0.75rem;
-        color: var(--muted);
+      .label-row label {
+        margin-bottom: 0;
+      }
+
+      label {
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: var(--text);
+      }
+
+      .field {
+        margin-bottom: 1rem;
+      }
+
+      .field:last-child {
+        margin-bottom: 0;
+      }
+
+      .info-tip {
+        position: relative;
+        display: inline-flex;
+        flex-shrink: 0;
+        cursor: help;
+      }
+
+      .info-tip-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 1rem;
+        height: 1rem;
+        border-radius: 50%;
+        font-size: 0.65rem;
+        font-weight: 700;
+        font-style: italic;
+        font-family: "DM Sans", system-ui, sans-serif;
+        color: var(--accent);
+        background: rgba(56, 189, 248, 0.15);
+        border: 1px solid rgba(56, 189, 248, 0.4);
+        line-height: 1;
+      }
+
+      .info-tip .tooltip {
+        visibility: hidden;
+        opacity: 0;
+        position: absolute;
+        z-index: 20;
+        left: 50%;
+        bottom: calc(100% + 0.45rem);
+        transform: translateX(-50%);
+        width: max-content;
+        max-width: min(16rem, 70vw);
+        padding: 0.5rem 0.65rem;
+        font-size: 0.72rem;
         font-weight: 400;
-        margin-top: 0.25rem;
+        font-style: normal;
+        line-height: 1.45;
+        color: var(--text);
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        box-shadow: var(--shadow);
+        pointer-events: none;
+        transition: opacity 0.12s ease, visibility 0.12s ease;
+      }
+
+      .info-tip .tooltip::after {
+        content: "";
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        border: 5px solid transparent;
+        border-top-color: var(--border);
+      }
+
+      .info-tip:hover .tooltip,
+      .info-tip:focus-within .tooltip {
+        visibility: visible;
+        opacity: 1;
+      }
+
+      .stat-main {
+        flex: 1;
+        min-width: 12rem;
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0.35rem;
+      }
+
+      .stat-label {
+        color: var(--muted);
+        font-size: 0.9rem;
       }
 
       input[type="number"] {
@@ -140,11 +238,6 @@
 
       .stat-row:last-child {
         border-bottom: none;
-      }
-
-      .stat-label {
-        color: var(--muted);
-        font-size: 0.9rem;
       }
 
       .stat-value {
@@ -195,73 +288,150 @@
       <header>
         <h1>FIRE calculator</h1>
         <p>
-          Estimate whether your invested assets can support your spending at a target age, using
-          compound growth while saving and a spend-down plan that targets $0 by a final age (plus a
-          perpetual withdrawal comparison).
+          Estimate whether your invested assets can support your spending at a target age. Nominal
+          return and inflation are combined into a real return for all projections (today’s dollars).
         </p>
       </header>
 
       <div class="grid grid-inputs">
         <div class="card">
           <h2>You today</h2>
-          <div style="margin-bottom: 1rem">
-            <label for="age">Current age</label>
+          <div class="field">
+            <div class="label-row">
+              <label for="age">Current age</label>
+              <span class="info-tip" tabindex="0"
+                ><span class="info-tip-icon" aria-hidden="true">i</span
+                ><span class="tooltip"
+                  >Sets years to target (retirement age − this). Each year until retirement, your
+                  portfolio and savings compound at the derived real return.</span
+                ></span
+              >
+            </div>
             <input type="number" id="age" min="18" max="100" step="1" value="35" />
           </div>
-          <div style="margin-bottom: 1rem">
-            <label for="assets">Investable assets</label>
+          <div class="field">
+            <div class="label-row">
+              <label for="assets">Investable assets</label>
+              <span class="info-tip" tabindex="0"
+                ><span class="info-tip-icon" aria-hidden="true">i</span
+                ><span class="tooltip"
+                  >Starting balance (cash, brokerage, retirement). Grows as balance × (1 + real
+                  return) before contributions—or shrinks if spending exceeds income.</span
+                ></span
+              >
+            </div>
             <input type="number" id="assets" min="0" step="1000" value="175000" />
-            <p class="hint">Cash + brokerage + retirement accounts you would draw from.</p>
           </div>
-          <div style="margin-bottom: 1rem">
-            <label for="income">Annual after-tax income</label>
+          <div class="field">
+            <div class="label-row">
+              <label for="income">Annual after-tax income</label>
+              <span class="info-tip" tabindex="0"
+                ><span class="info-tip-icon" aria-hidden="true">i</span
+                ><span class="tooltip"
+                  >Money available each year while working (today’s dollars). With today’s expenses,
+                  defines implied savings invested until retirement.</span
+                ></span
+              >
+            </div>
             <input type="number" id="income" min="0" step="1000" value="92000" />
           </div>
-          <div>
-            <label for="expensesNow">Annual expenses today (while working)</label>
+          <div class="field">
+            <div class="label-row">
+              <label for="expensesNow">Annual expenses today (while working)</label>
+              <span class="info-tip" tabindex="0"
+                ><span class="info-tip-icon" aria-hidden="true">i</span
+                ><span class="tooltip"
+                  >What you spend now, in today’s dollars. Subtracted from income to get annual
+                  savings added each year during the accumulation phase.</span
+                ></span
+              >
+            </div>
             <input type="number" id="expensesNow" min="0" step="1000" value="60000" />
-            <p class="hint">
-              Used to estimate how much you can invest each year (income minus this figure).
-            </p>
           </div>
         </div>
 
         <div class="card">
           <h2>Retirement target</h2>
-          <div style="margin-bottom: 1rem">
-            <label for="retireAge">Desired retirement age</label>
+          <div class="field">
+            <div class="label-row">
+              <label for="retireAge">Desired retirement age</label>
+              <span class="info-tip" tabindex="0"
+                ><span class="info-tip-icon" aria-hidden="true">i</span
+                ><span class="tooltip"
+                  >End of saving and start of drawdown. Projected portfolio and gap vs target are
+                  evaluated at this age.</span
+                ></span
+              >
+            </div>
             <input type="number" id="retireAge" min="19" max="100" step="1" value="55" />
           </div>
-          <div style="margin-bottom: 1rem">
-            <label for="dieAge">Plan through age (end with $0)</label>
+          <div class="field">
+            <div class="label-row">
+              <label for="dieAge">Plan through age (end with $0)</label>
+              <span class="info-tip" tabindex="0"
+                ><span class="info-tip-icon" aria-hidden="true">i</span
+                ><span class="tooltip"
+                  >Last age you plan to spend from the portfolio. With retirement age, sets drawdown
+                  years and the spend-down nest egg (level real withdrawals ending near $0).</span
+                ></span
+              >
+            </div>
             <input type="number" id="dieAge" min="20" max="120" step="1" value="90" />
-            <p class="hint">
-              Spending is modeled through this age; the portfolio should reach zero after the last
-              year of retirement drawdown (level real withdrawals, same expected return as above).
-            </p>
           </div>
-          <div style="margin-bottom: 1rem">
-            <label for="expenses">Annual expenses in retirement (today’s dollars)</label>
+          <div class="field">
+            <div class="label-row">
+              <label for="expenses">Annual expenses in retirement (today’s dollars)</label>
+              <span class="info-tip" tabindex="0"
+                ><span class="info-tip-icon" aria-hidden="true">i</span
+                ><span class="tooltip"
+                  >Yearly spending after you stop working, held constant in purchasing power. Drives
+                  portfolio needed at retirement and the perpetual-income comparison.</span
+                ></span
+              >
+            </div>
             <input type="number" id="expenses" min="0" step="1000" value="48000" />
-            <p class="hint">
-              Sets the spend-down nest egg and the perpetual-withdrawal comparison. Often lower
-              than working expenses—prefill is illustrative.
-            </p>
           </div>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem">
+          <div class="field returns-grid">
             <div>
-              <label for="realReturn">Real return % / yr</label>
-              <input type="number" id="realReturn" min="-10" max="20" step="0.1" value="5" />
+              <div class="label-row">
+                <label for="nominalReturn">Expected return % / yr</label>
+                <span class="info-tip" tabindex="0"
+                  ><span class="info-tip-icon" aria-hidden="true">i</span
+                  ><span class="tooltip"
+                    >Nominal portfolio return before inflation (e.g. 8%). Combined with inflation to
+                    get the real return used in all math.</span
+                  ></span
+                >
+              </div>
+              <input type="number" id="nominalReturn" min="-20" max="30" step="0.1" value="8" />
             </div>
             <div>
-              <label for="withdrawal">Withdrawal rate %</label>
+              <div class="label-row">
+                <label for="inflation">Inflation % / yr</label>
+                <span class="info-tip" tabindex="0"
+                  ><span class="info-tip-icon" aria-hidden="true">i</span
+                  ><span class="tooltip"
+                    >Expected annual rise in cost of living. Real return = (1 + nominal) ÷ (1 +
+                    inflation) − 1 so amounts stay in today’s dollars.</span
+                  ></span
+                >
+              </div>
+              <input type="number" id="inflation" min="0" max="15" step="0.1" value="3" />
+            </div>
+            <div>
+              <div class="label-row">
+                <label for="withdrawal">Withdrawal rate %</label>
+                <span class="info-tip" tabindex="0"
+                  ><span class="info-tip-icon" aria-hidden="true">i</span
+                  ><span class="tooltip"
+                    >Used only for the perpetual-income comparison (nest egg = expenses ÷ rate). The
+                    main path uses spend-down to $0, not this rate.</span
+                  ></span
+                >
+              </div>
               <input type="number" id="withdrawal" min="2" max="6" step="0.1" value="4" />
             </div>
           </div>
-          <p class="hint">
-            “Real return” is after inflation (used for saving, spend-down PV, and the optional
-            perpetual nest egg). Withdrawal % is only for the perpetual comparison row.
-          </p>
         </div>
       </div>
 
@@ -279,6 +449,30 @@
 
     <script>
       const $ = (id) => document.getElementById(id);
+
+      function escHtml(s) {
+        return String(s)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;");
+      }
+
+      function infoTip(text) {
+        return (
+          '<span class="info-tip" tabindex="0">' +
+          '<span class="info-tip-icon" aria-hidden="true">i</span>' +
+          '<span class="tooltip">' +
+          escHtml(text) +
+          "</span></span>"
+        );
+      }
+
+      function realReturnRate(nominalPct, inflationPct) {
+        const n = nominalPct / 100;
+        const i = inflationPct / 100;
+        return (1 + n) / (1 + i) - 1;
+      }
 
       function fmtMoney(n) {
         if (!Number.isFinite(n)) return "—";
@@ -320,14 +514,14 @@
         const income = Number($("income").value);
         const expensesNow = Number($("expensesNow").value);
         const expenses = Number($("expenses").value);
-        const realReturnPct = Number($("realReturn").value);
+        const nominalReturnPct = Number($("nominalReturn").value);
+        const inflationPct = Number($("inflation").value);
         const withdrawalPct = Number($("withdrawal").value);
 
         const statsEl = $("stats");
         const bannerEl = $("banner");
 
         const years = retireAge - age;
-        const r = realReturnPct / 100;
         const wr = withdrawalPct / 100;
 
         if (
@@ -339,7 +533,8 @@
             income,
             expensesNow,
             expenses,
-            realReturnPct,
+            nominalReturnPct,
+            inflationPct,
             withdrawalPct,
           ].every(Number.isFinite)
         ) {
@@ -360,6 +555,16 @@
           bannerEl.innerHTML = "";
           return;
         }
+
+        if (inflationPct <= -100) {
+          statsEl.innerHTML =
+            "<p class='stat-label'>Inflation must be greater than −100%.</p>";
+          bannerEl.innerHTML = "";
+          return;
+        }
+
+        const r = realReturnRate(nominalReturnPct, inflationPct);
+        const realReturnPct = r * 100;
 
         const drawdownYears = dieAge - retireAge;
         if (drawdownYears <= 0) {
@@ -391,28 +596,61 @@
         const savingsRate = income > 0 ? (annualSave / income) * 100 : null;
 
         const rows = [
-          ["Years to target", years + " yrs"],
-          ["Drawdown years (to age " + dieAge + ")", drawdownYears + " yrs"],
-          ["Implied savings (income − expenses)", fmtMoney(annualSave)],
+          [
+            "Real return (derived)",
+            realReturnPct.toFixed(2) + "%",
+            "After inflation: (1 + expected return) ÷ (1 + inflation) − 1. Used to compound savings and size the spend-down target.",
+          ],
+          [
+            "Years to target",
+            years + " yrs",
+            "Retirement age minus current age. How long assets and annual savings compound before the projection is checked.",
+          ],
+          [
+            "Drawdown years (to age " + dieAge + ")",
+            drawdownYears + " yrs",
+            "Plan-through age minus retirement age. Count of equal real withdrawals used to size the spend-down nest egg.",
+          ],
+          [
+            "Implied savings (income − expenses)",
+            fmtMoney(annualSave),
+            "Annual amount added to the portfolio while working (or withdrawn pre-retirement if negative). Feeds the savings annuity in the projection.",
+          ],
           ...(annualSave >= 0 && income > 0
-            ? [["Savings rate (of income)", savingsRate.toFixed(1) + "%"]]
+            ? [
+                [
+                  "Savings rate (of income)",
+                  savingsRate.toFixed(1) + "%",
+                  "Implied savings divided by income. Higher rates grow the projected portfolio faster, all else equal.",
+                ],
+              ]
             : []),
           [
             "Portfolio needed at retirement ($0 by age " + dieAge + ")",
             fmtMoney(targetSpendDown),
+            "Present value at retirement of level real spending for drawdown years—the main FIRE target (spend-down to ~$0).",
           ],
           [
             "Perpetual-income comparison (" + withdrawalPct + "% WR)",
             fmtMoney(perpetualTarget),
+            "Retirement expenses ÷ withdrawal rate. Alternate benchmark if you never spent principal; not used for the gap banner.",
           ],
-          ["Projected portfolio at " + retireAge, fmtMoney(projected)],
-          ["Gap vs spend-down target", fmtMoney(surplus)],
+          [
+            "Projected portfolio at " + retireAge,
+            fmtMoney(projected),
+            "FV of starting assets plus FV of annual savings (or year-by-year draw if savings are negative), at the real return.",
+          ],
+          [
+            "Gap vs spend-down target",
+            fmtMoney(surplus),
+            "Projected portfolio minus spend-down target. Positive means on track for the $0-by-plan-age path; negative is the shortfall.",
+          ],
         ];
 
         statsEl.innerHTML = rows
           .map(
-            ([k, v]) =>
-              `<div class="stat-row"><span class="stat-label">${k}</span><span class="stat-value">${v}</span></div>`
+            ([label, value, info]) =>
+              `<div class="stat-row"><div class="stat-main"><span class="stat-label">${escHtml(label)}</span>${infoTip(info)}</div><span class="stat-value">${escHtml(value)}</span></div>`
           )
           .join("");
 
@@ -451,7 +689,8 @@
         "dieAge",
         "expensesNow",
         "expenses",
-        "realReturn",
+        "nominalReturn",
+        "inflation",
         "withdrawal",
       ].forEach((id) => {
         $(id).addEventListener("input", calc);
