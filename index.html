@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FIRE Calculator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@450;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #0f1419;
+        --surface: #1a222c;
+        --surface2: #242f3d;
+        --border: #334155;
+        --text: #e8eef4;
+        --muted: #94a3b8;
+        --accent: #38bdf8;
+        --accent2: #a78bfa;
+        --success: #4ade80;
+        --warn: #fbbf24;
+        --danger: #f87171;
+        --radius: 12px;
+        --shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "DM Sans", system-ui, sans-serif;
+        background: radial-gradient(ellipse 120% 80% at 50% -20%, #1e3a5f 0%, transparent 55%),
+          var(--bg);
+        color: var(--text);
+        line-height: 1.5;
+        padding: 1.5rem;
+      }
+
+      .wrap {
+        max-width: 920px;
+        margin: 0 auto;
+      }
+
+      header {
+        margin-bottom: 2rem;
+      }
+
+      header h1 {
+        font-size: clamp(1.75rem, 4vw, 2.25rem);
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        margin: 0 0 0.35rem;
+      }
+
+      header p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.95rem;
+      }
+
+      .grid {
+        display: grid;
+        gap: 1.25rem;
+      }
+
+      @media (min-width: 720px) {
+        .grid-inputs {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 1.25rem 1.35rem;
+        box-shadow: var(--shadow);
+      }
+
+      .card h2 {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--muted);
+        margin: 0 0 1rem;
+        font-weight: 600;
+      }
+
+      label {
+        display: block;
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: var(--text);
+        margin-bottom: 0.35rem;
+      }
+
+      .hint {
+        font-size: 0.75rem;
+        color: var(--muted);
+        font-weight: 400;
+        margin-top: 0.25rem;
+      }
+
+      input[type="number"] {
+        width: 100%;
+        padding: 0.65rem 0.85rem;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        background: var(--surface2);
+        color: var(--text);
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.95rem;
+      }
+
+      input[type="number"]:focus {
+        outline: none;
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
+      }
+
+      .results {
+        margin-top: 1.25rem;
+      }
+
+      .stat-row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 0.5rem 1rem;
+        padding: 0.85rem 0;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .stat-row:last-child {
+        border-bottom: none;
+      }
+
+      .stat-label {
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+
+      .stat-value {
+        font-family: "JetBrains Mono", monospace;
+        font-weight: 600;
+        font-size: 1rem;
+      }
+
+      .banner {
+        margin-top: 1rem;
+        padding: 1rem 1.15rem;
+        border-radius: var(--radius);
+        font-size: 0.95rem;
+        line-height: 1.55;
+      }
+
+      .banner.on-track {
+        background: rgba(74, 222, 128, 0.12);
+        border: 1px solid rgba(74, 222, 128, 0.35);
+        color: #bbf7d0;
+      }
+
+      .banner.short {
+        background: rgba(251, 191, 36, 0.12);
+        border: 1px solid rgba(251, 191, 36, 0.35);
+        color: #fde68a;
+      }
+
+      .banner.negative {
+        background: rgba(248, 113, 113, 0.12);
+        border: 1px solid rgba(248, 113, 113, 0.35);
+        color: #fecaca;
+      }
+
+      footer {
+        margin-top: 2rem;
+        font-size: 0.8rem;
+        color: var(--muted);
+      }
+
+      footer a {
+        color: var(--accent);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <h1>FIRE calculator</h1>
+        <p>
+          Estimate whether your invested assets can support your spending at a target age, using
+          compound growth while saving and a spend-down plan that targets $0 by a final age (plus a
+          perpetual withdrawal comparison).
+        </p>
+      </header>
+
+      <div class="grid grid-inputs">
+        <div class="card">
+          <h2>You today</h2>
+          <div style="margin-bottom: 1rem">
+            <label for="age">Current age</label>
+            <input type="number" id="age" min="18" max="100" step="1" value="35" />
+          </div>
+          <div style="margin-bottom: 1rem">
+            <label for="assets">Investable assets</label>
+            <input type="number" id="assets" min="0" step="1000" value="175000" />
+            <p class="hint">Cash + brokerage + retirement accounts you would draw from.</p>
+          </div>
+          <div style="margin-bottom: 1rem">
+            <label for="income">Annual after-tax income</label>
+            <input type="number" id="income" min="0" step="1000" value="92000" />
+          </div>
+          <div>
+            <label for="expensesNow">Annual expenses today (while working)</label>
+            <input type="number" id="expensesNow" min="0" step="1000" value="60000" />
+            <p class="hint">
+              Used to estimate how much you can invest each year (income minus this figure).
+            </p>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Retirement target</h2>
+          <div style="margin-bottom: 1rem">
+            <label for="retireAge">Desired retirement age</label>
+            <input type="number" id="retireAge" min="19" max="100" step="1" value="55" />
+          </div>
+          <div style="margin-bottom: 1rem">
+            <label for="dieAge">Plan through age (end with $0)</label>
+            <input type="number" id="dieAge" min="20" max="120" step="1" value="90" />
+            <p class="hint">
+              Spending is modeled through this age; the portfolio should reach zero after the last
+              year of retirement drawdown (level real withdrawals, same expected return as above).
+            </p>
+          </div>
+          <div style="margin-bottom: 1rem">
+            <label for="expenses">Annual expenses in retirement (today’s dollars)</label>
+            <input type="number" id="expenses" min="0" step="1000" value="48000" />
+            <p class="hint">
+              Sets the spend-down nest egg and the perpetual-withdrawal comparison. Often lower
+              than working expenses—prefill is illustrative.
+            </p>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem">
+            <div>
+              <label for="realReturn">Real return % / yr</label>
+              <input type="number" id="realReturn" min="-10" max="20" step="0.1" value="5" />
+            </div>
+            <div>
+              <label for="withdrawal">Withdrawal rate %</label>
+              <input type="number" id="withdrawal" min="2" max="6" step="0.1" value="4" />
+            </div>
+          </div>
+          <p class="hint">
+            “Real return” is after inflation (used for saving, spend-down PV, and the optional
+            perpetual nest egg). Withdrawal % is only for the perpetual comparison row.
+          </p>
+        </div>
+      </div>
+
+      <div class="card results" id="resultsCard" style="margin-top: 1.25rem">
+        <h2>Projection</h2>
+        <div id="stats"></div>
+        <div id="banner"></div>
+      </div>
+
+      <footer>
+        Not financial advice. Models ignore taxes in drawdown, sequence of returns, and changing
+        expenses—use as a directional check only.
+      </footer>
+    </div>
+
+    <script>
+      const $ = (id) => document.getElementById(id);
+
+      function fmtMoney(n) {
+        if (!Number.isFinite(n)) return "—";
+        const abs = Math.abs(n);
+        const sign = n < 0 ? "−" : "";
+        return (
+          sign +
+          new Intl.NumberFormat("en-US", {
+            style: "currency",
+            currency: "USD",
+            maximumFractionDigits: 0,
+          }).format(abs)
+        );
+      }
+
+      function fvLumpSum(pv, r, n) {
+        if (r === 0) return pv;
+        return pv * Math.pow(1 + r, n);
+      }
+
+      function fvAnnuity(pmt, r, n) {
+        if (n <= 0) return 0;
+        if (r === 0) return pmt * n;
+        return pmt * ((Math.pow(1 + r, n) - 1) / r);
+      }
+
+      /** PV at retirement of n end-of-year real withdrawals of `annualPayment`, ending at $0. */
+      function pvSpendDown(annualPayment, r, n) {
+        if (n <= 0) return 0;
+        if (r === 0) return annualPayment * n;
+        return (annualPayment * (1 - Math.pow(1 + r, -n))) / r;
+      }
+
+      function calc() {
+        const age = Number($("age").value);
+        const retireAge = Number($("retireAge").value);
+        const dieAge = Number($("dieAge").value);
+        const assets = Number($("assets").value);
+        const income = Number($("income").value);
+        const expensesNow = Number($("expensesNow").value);
+        const expenses = Number($("expenses").value);
+        const realReturnPct = Number($("realReturn").value);
+        const withdrawalPct = Number($("withdrawal").value);
+
+        const statsEl = $("stats");
+        const bannerEl = $("banner");
+
+        const years = retireAge - age;
+        const r = realReturnPct / 100;
+        const wr = withdrawalPct / 100;
+
+        if (
+          ![
+            age,
+            retireAge,
+            dieAge,
+            assets,
+            income,
+            expensesNow,
+            expenses,
+            realReturnPct,
+            withdrawalPct,
+          ].every(Number.isFinite)
+        ) {
+          statsEl.innerHTML = "<p class='stat-label'>Enter valid numbers in all fields.</p>";
+          bannerEl.innerHTML = "";
+          return;
+        }
+
+        if (years <= 0) {
+          statsEl.innerHTML =
+            "<p class='stat-label'>Retirement age must be greater than current age.</p>";
+          bannerEl.innerHTML = "";
+          return;
+        }
+
+        if (wr <= 0) {
+          statsEl.innerHTML = "<p class='stat-label'>Withdrawal rate must be positive.</p>";
+          bannerEl.innerHTML = "";
+          return;
+        }
+
+        const drawdownYears = dieAge - retireAge;
+        if (drawdownYears <= 0) {
+          statsEl.innerHTML =
+            "<p class='stat-label'>Plan-through age must be greater than retirement age.</p>";
+          bannerEl.innerHTML = "";
+          return;
+        }
+
+        const annualSave = income - expensesNow;
+        const targetSpendDown = pvSpendDown(expenses, r, drawdownYears);
+        const perpetualTarget = expenses / wr;
+
+        let projected;
+        if (annualSave >= 0) {
+          const fvAssets = fvLumpSum(assets, r, years);
+          const fvContributions = fvAnnuity(annualSave, r, years);
+          projected = fvAssets + fvContributions;
+        } else {
+          const deficit = -annualSave;
+          let balance = assets;
+          for (let i = 0; i < years; i++) {
+            balance = balance * (1 + r) - deficit;
+          }
+          projected = balance;
+        }
+
+        const surplus = projected - targetSpendDown;
+        const savingsRate = income > 0 ? (annualSave / income) * 100 : null;
+
+        const rows = [
+          ["Years to target", years + " yrs"],
+          ["Drawdown years (to age " + dieAge + ")", drawdownYears + " yrs"],
+          ["Implied savings (income − expenses)", fmtMoney(annualSave)],
+          ...(annualSave >= 0 && income > 0
+            ? [["Savings rate (of income)", savingsRate.toFixed(1) + "%"]]
+            : []),
+          [
+            "Portfolio needed at retirement ($0 by age " + dieAge + ")",
+            fmtMoney(targetSpendDown),
+          ],
+          [
+            "Perpetual-income comparison (" + withdrawalPct + "% WR)",
+            fmtMoney(perpetualTarget),
+          ],
+          ["Projected portfolio at " + retireAge, fmtMoney(projected)],
+          ["Gap vs spend-down target", fmtMoney(surplus)],
+        ];
+
+        statsEl.innerHTML = rows
+          .map(
+            ([k, v]) =>
+              `<div class="stat-row"><span class="stat-label">${k}</span><span class="stat-value">${v}</span></div>`
+          )
+          .join("");
+
+        let bannerClass = "short";
+        let msg = "";
+
+        if (annualSave < 0) {
+          bannerClass = "negative";
+          msg =
+            "Expenses exceed income with these numbers, so the model assumes you spend down assets each year before retirement. Raise income, lower expenses, or add assets.";
+        } else if (projected >= targetSpendDown) {
+          bannerClass = "on-track";
+          msg =
+            "At retirement you meet or beat the spend-down target for level real spending through age " +
+            dieAge +
+            " (ending near $0 on this simplified path). Stress-test with lower returns, taxes, and health or legacy goals.";
+        } else {
+          const shortBy = targetSpendDown - projected;
+          msg =
+            "Under these assumptions you are short about " +
+            fmtMoney(shortBy) +
+            " versus the spend-down target at age " +
+            retireAge +
+            ". Options: save more, retire later, plan a later end age, reduce retirement spending, or accept higher portfolio risk (not guaranteed).";
+        }
+
+        bannerEl.className = "banner " + bannerClass;
+        bannerEl.textContent = msg;
+      }
+
+      [
+        "age",
+        "assets",
+        "income",
+        "retireAge",
+        "dieAge",
+        "expensesNow",
+        "expenses",
+        "realReturn",
+        "withdrawal",
+      ].forEach((id) => {
+        $(id).addEventListener("input", calc);
+        $(id).addEventListener("change", calc);
+      });
+
+      calc();
+    </script>
+  </body>
+</html>
